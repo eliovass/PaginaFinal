@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiencias Detalladas • JACHA TOURS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;600&family=Montserrat:wght@200;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --black: #0A0A0B;
+            --surface: #161618;
+            --text-muted: rgba(229, 229, 231, 0.6);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { background-color: var(--black); color: white; font-family: 'Montserrat', sans-serif; overflow-x: hidden; }
+
+        /* --- NAVEGACIÓN --- */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5vw; background: rgba(10, 10, 11, 0.9); backdrop-filter: blur(15px);
+            position: fixed; top: 0; width: 100%; z-index: 1000; border-bottom: 1px solid rgba(212,175,55,0.1);
+        }
+        .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; margin-left: 25px; font-size: 0.75rem; text-transform: uppercase; transition: 0.3s; }
+        .nav-links a.active, .nav-links a:hover { color: var(--gold); }
+
+        /* --- 1. HERO VIDEO --- */
+        .hero-video {
+            position: relative; height: 60vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .video-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -1; opacity: 0.5; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--black)); }
+        .hero-content h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(3rem, 8vw, 5rem); color: var(--gold); z-index: 1; text-align: center; font-weight: 300; }
+
+        /* --- 2. NIVELES DE EXPERIENCIA --- */
+        .levels-section { padding: 80px 5vw; max-width: 1300px; margin: 0 auto; }
+        .section-title { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--gold); text-align: center; margin-bottom: 50px; text-transform: uppercase; letter-spacing: 4px; }
+        
+        .levels-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .level-card {
+            background: var(--surface); border: 1px solid rgba(212,175,55,0.1); padding: 50px 40px;
+            transition: var(--transition); position: relative; overflow: hidden;
+        }
+        .level-card:hover { transform: translateY(-10px); border-color: var(--gold); }
+        .level-card.featured { border: 1px solid var(--gold); background: rgba(212, 175, 55, 0.03); }
+        .level-badge { background: var(--gold); color: black; font-size: 0.65rem; font-weight: 800; padding: 7px 0; position: absolute; top: 20px; right: -35px; transform: rotate(45deg); width: 140px; text-align: center; }
+        
+        .level-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; margin-bottom: 25px; color: var(--gold); border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 15px; }
+        .level-card ul { list-style: none; margin-bottom: 40px; }
+        .level-card li { margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; }
+        .level-card li::before { content: "◈"; color: var(--gold); margin-right: 12px; font-size: 0.7rem; }
+        
+        .btn-gold { display: block; width: 100%; padding: 15px; border: 1px solid var(--gold); color: var(--gold); text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; text-align: center; transition: 0.4s; font-weight: 600; }
+        .btn-gold:hover { background: var(--gold); color: black; }
+        .btn-active { background: var(--gold); color: black; }
+
+        /* --- 3. EXPLORADOR INTERACTIVO (ESTILO CAPTURA) --- */
+        .explorer-section { padding: 100px 5vw; background: #0c0c0d; border-top: 1px solid rgba(255,255,255,0.05); }
+        .explorer-container { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+        
+        .exp-menu { display: flex; flex-direction: column; gap: 12px; }
+        .exp-btn {
+            background: var(--surface); border: 1px solid rgba(255,255,255,0.05); color: var(--text-muted);
+            padding: 25px; text-align: left; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 3px; cursor: pointer; transition: 0.3s;
+        }
+        .exp-btn.active { border-left: 4px solid var(--gold); color: var(--gold); background: rgba(212, 175, 55, 0.05); padding-left: 30px; }
+
+        .exp-viewer { position: relative; aspect-ratio: 16/9; border: 1px solid rgba(255,255,255,0.1); background: #000; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .exp-viewer img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s ease-in-out; }
+        
+        .arr { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.7); border: 1px solid var(--gold); color: var(--gold); width: 55px; height: 55px; cursor: pointer; font-size: 1.8rem; z-index: 5; border-radius: 50%; transition: 0.3s; }
+        .arr:hover { background: var(--gold); color: black; }
+        .arr-l { left: 20px; } .arr-r { right: 20px; }
+        .img-counter { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 5px 15px; font-size: 0.7rem; border-radius: 20px; color: var(--gold); border: 1px solid var(--gold); }
+
+        .exp-info { grid-column: 1 / -1; background: var(--surface); padding: 60px; border-top: 4px solid var(--gold); margin-top: 30px; }
+        .exp-info h2 { font-family: 'Cormorant Garamond', serif; font-size: 3rem; color: var(--gold); margin-bottom: 25px; }
+        .exp-info .desc-text { color: var(--text-muted); font-size: 1.1rem; line-height: 1.8; margin-bottom: 40px; border-left: 2px solid var(--gold); padding-left: 25px; }
+        .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .spec-item h4 { color: var(--gold); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; margin-bottom: 10px; }
+        .spec-item p { color: white; font-size: 0.9rem; font-weight: 200; }
+
+        /* --- 4. GALERÍA INFINITA --- */
+        .infinite-gallery { padding: 80px 0; overflow: hidden; background: var(--black); }
+        .track { display: flex; width: calc(400px * 16); animation: scroll 50s linear infinite; }
+        .slide { width: 400px; height: 280px; padding: 15px; flex-shrink: 0; }
+        .slide img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(30%); transition: 0.6s; border: 1px solid rgba(212,175,55,0.2); }
+        .slide img:hover { filter: grayscale(0%); transform: scale(1.08); border-color: var(--gold); z-index: 10; }
+
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-400px * 8)); } }
+
+        footer { text-align: center; padding: 80px; color: var(--text-muted); font-size: 0.75rem; letter-spacing: 3px; border-top: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html" class="logo">JACHA TOURS</a>
+        <div class="nav-links">
+            <a href="index.html">Inicio</a>
+            <a href="circuito.html">Circuito</a>
+            <a href="experiencia.html" class="active">Experiencias</a>
+            <a href="reservas.html">Reservas</a>
+        </div>
+    </nav>
+
+    <section class="hero-video">
+        <video autoplay muted loop playsinline class="video-bg">
+            <source src="videos/hero-background.mp4" type="video/mp4">
+        </video>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Inmersión Jacha</h1>
+        </div>
+    </section>
+
+    <section class="levels-section">
+        <h2 class="section-title">Categorías de Tour</h2>
+        <div class="levels-grid">
+            <div class="level-card">
+                <h3>Blue Silver</h3>
+                <ul>
+                    <li>Acceso a perímetros y fachadas</li>
+                    <li>Guía histórica de arquitectura</li>
+                    <li>Sesión de fotos exterior</li>
+                    <li>Audioguía descargable</li>
+                </ul>
+                <a href="reservas.html" class="btn-gold">Elegir Blue</a>
+            </div>
+            <div class="level-card featured">
+                <div class="level-badge">RECOMENDADO</div>
+                <h3>Aurum Gold</h3>
+                <ul>
+                    <li>Ingreso a Salones Principales</li>
+                    <li>Tour por Cocinas Industriales</li>
+                    <li>Acceso a Escenarios de Gala</li>
+                    <li>Degustación de aperitivos locales</li>
+                </ul>
+                <a href="reservas.html" class="btn-gold btn-active">Reservar Aurum</a>
+            </div>
+            <div class="level-card">
+                <h3>Platinum VIP</h3>
+                <ul>
+                    <li>Acceso a Penthouses (Garzonier)</li>
+                    <li>Encuentro con arquitectos/dueños</li>
+                    <li>Cena Privada en el Cholet</li>
+                    <li>Transporte Privado VIP</li>
+                </ul>
+                <a href="reservas.html" class="btn-gold">Elegir Platinum</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="explorer-section">
+        <h2 class="section-title">Exploración de Áreas</h2>
+        <div class="explorer-container">
+            <aside class="exp-menu">
+                <button class="exp-btn active" onclick="updateE('fachada')">Fachada</button>
+                <button class="exp-btn" onclick="updateE('salon')">Salón de Gala</button>
+                <button class="exp-btn" onclick="updateE('escenario')">Escenario</button>
+                <button class="exp-btn" onclick="updateE('cocina')">Cocina</button>
+                <button class="exp-btn" onclick="updateE('garzonier')">Garzonier</button>
+            </aside>
+            <div class="exp-viewer">
+                <button class="arr arr-l" onclick="moveImg(-1)">‹</button>
+                <img id="exp-img" src="" alt="Vista Detallada">
+                <div class="img-counter" id="img-counter">1 / 5</div>
+                <button class="arr arr-r" onclick="moveImg(1)">›</button>
+            </div>
+            <article class="exp-info">
+                <h2 id="exp-title">Cargando...</h2>
+                <p id="exp-desc" class="desc-text"></p>
+                <div class="spec-grid" id="exp-specs"></div>
+            </article>
+        </div>
+    </section>
+
+    <section class="infinite-gallery">
+        <div class="track" id="gallery-track"></div>
+    </section>
+
+    <footer>
+        © 2026 JACHA TOURS • DISEÑO Y CULTURA ANDINA • EL ALTO, BOLIVIA
+    </footer>
+
+    <script>
+        // BASE DE DATOS COMPLETA - TODAS LAS FOTOS DE TU TREE
+        const content = {
+            fachada: {
+                t: "Arquitectura Exterior y Fachada",
+                d: "Las fachadas de los Cholets son obras maestras del 'Arquitectura Transformer' o Neo-Andina. Representan el éxito económico y la identidad cultural de la burguesía Aymara, utilizando colores que evocan los tejidos de los aguayos y formas geométricas de la cultura Tiwanacota.",
+                specs: [
+                    {h: "Materiales", p: "Vidrio templado reflectivo de alta densidad y policarbonatos."},
+                    {h: "Iconografía", p: "Presencia de la Chakana (cruz andina) y figuras de animales sagrados."},
+                    {h: "Impacto", p: "Diseños que cambian de tonalidad según la posición del sol."}
+                ],
+                i: [
+                    "images/img-experiencia/galeria/exteriores/exterior01.jpg", 
+                    "images/img-experiencia/galeria/exteriores/exterior02.jpg",
+                    "images/img-experiencia/galeria/exteriores/exterior03.jpg",
+                    "images/img-experiencia/galeria/exteriores/exterior04.jpg",
+                    "images/img-experiencia/galeria/exteriores/exterior05.jpg"
+                ]
+            },
+            salon: {
+                t: "Salón de Gala y Ambientes",
+                d: "El corazón social del Cholet. Estos espacios de triple altura están diseñados para albergar fiestas que duran días. La decoración es barroca andina, con molduras bañadas en colores metálicos y lámparas de cristal monumentales.",
+                specs: [
+                    {h: "Capacidad", p: "Espacios para más de 500 personas en eventos masivos."},
+                    {h: "Iluminación", p: "Lámparas de cristal importadas y sistemas de luces LED rítmicas."},
+                    {h: "Acabados", p: "Columnas trabajadas con relieves y techos policromados."}
+                ],
+                i: [
+                    "images/img-experiencia/galeria/ambiente/ambiente01.jpg", 
+                    "images/img-experiencia/galeria/ambiente/ambiente02.jpg"
+                ]
+            },
+            escenario: {
+                t: "Escenarios de Entretenimiento",
+                d: "Donde la música en vivo y las fraternidades de danza cobran vida. El escenario es un punto focal técnico, equipado para soportar orquestas internacionales y espectáculos de luces robóticas.",
+                specs: [
+                    {h: "Acústica", p: "Paneles de absorción de sonido integrados en el diseño decorativo."},
+                    {h: "Tecnología", p: "Puntos de conexión para pantallas LED y consolas de sonido."},
+                    {h: "Estructura", p: "Escenarios reforzados para soportar alto peso y movimiento."}
+                ],
+                i: [
+                    "images/img-experiencia/galeria/escenario/esenario01.jpg", 
+                    "images/img-experiencia/galeria/escenario/esenario02.jpg",
+                    "images/img-experiencia/galeria/escenario/esenario03.jpg"
+                ]
+            },
+            cocina: {
+                t: "Logística y Cocina Industrial",
+                d: "Un área crítica para el funcionamiento del edificio. Estas cocinas de grado industrial están diseñadas para la preparación simultánea de miles de platos, manteniendo la eficiencia en banquetes de gran escala.",
+                specs: [
+                    {h: "Equipamiento", p: "Acero inoxidable quirúrgico y hornos industriales de alta potencia."},
+                    {h: "Logística", p: "Circuitos de servicio directo al salón principal."},
+                    {h: "Higiene", p: "Sistemas de extracción industrial y gestión de residuos."}
+                ],
+                i: [
+                    "images/img-experiencia/galeria/cocina/cocina01.jpg", 
+                    "images/img-experiencia/galeria/cocina/cocina02.jpg",
+                    "images/img-experiencia/galeria/cocina/cocina03.jpg",
+                    "images/img-experiencia/galeria/cocina/cocina04.jpg",
+                    "images/img-experiencia/galeria/cocina/cocina05.jpg"
+                ]
+            },
+            garzonier: {
+                t: "Garzonier y Áreas VIP",
+                d: "Ubicados en la 'casa del dueño' en lo más alto del edificio. Estos espacios ofrecen una privacidad absoluta y las vistas más impresionantes de El Alto y los nevados del Illimani.",
+                specs: [
+                    {h: "Exclusividad", p: "Acceso restringido solo para el tour Platinum VIP."},
+                    {h: "Interiorismo", p: "Muebles a medida y acabados de lujo superiores."},
+                    {h: "Vistas", p: "Miradores panorámicos de 360 grados sobre la urbe alteña."}
+                ],
+                i: [
+                    "images/img-experiencia/galeria/garzonier/garzonier01.jpg"
+                ]
+            }
+        };
+
+        let currentE = 'fachada';
+        let imgIdx = 0;
+
+        function updateE(z) {
+            currentE = z; imgIdx = 0;
+            const d = content[z];
+            const img = document.getElementById('exp-img');
+            img.style.opacity = 0;
+            
+            setTimeout(() => {
+                img.src = d.i[imgIdx];
+                img.style.opacity = 1;
+                document.getElementById('exp-title').innerText = d.t;
+                document.getElementById('exp-desc').innerText = d.d;
+                document.getElementById('img-counter').innerText = `${imgIdx + 1} / ${d.i.length}`;
+                
+                document.getElementById('exp-specs').innerHTML = d.specs.map(s => `
+                    <div class="spec-item">
+                        <h4>${s.h}</h4>
+                        <p>${s.p}</p>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.exp-btn').forEach(b => {
+                    b.classList.toggle('active', b.innerText.toLowerCase().includes(z.substring(0,4)));
+                });
+            }, 300);
+        }
+
+        function moveImg(n) {
+            const list = content[currentE].i;
+            imgIdx = (imgIdx + n + list.length) % list.length;
+            document.getElementById('exp-img').src = list[imgIdx];
+            document.getElementById('img-counter').innerText = `${imgIdx + 1} / ${list.length}`;
+        }
+
+        // GALERÍA INFINITA (USA LAS FOTOS PRINCIPALES)
+        const galleryImgs = [
+            "images/cholet_titanic.jpg", "images/cholet_rojo.jpg", "images/cholet_alexander.jpg", 
+            "images/cholet_metropolis.jpg", "images/cholet_modelado.jpg", "images/cholet_rojogrande.jpg",
+            "images/img-inicio/cholets/cholet-crucero.jpeg", "images/img-inicio/cholets/cholet-transformer.jpeg"
+        ];
+        const track = document.getElementById('gallery-track');
+        [...galleryImgs, ...galleryImgs].forEach(s => {
+            const d = document.createElement('div'); d.className = 'slide';
+            d.innerHTML = `<img src="${s}" loading="lazy">`;
+            track.appendChild(d);
+        });
+
+        window.onload = () => updateE('fachada');
+    </script>
+</body>
+</html>

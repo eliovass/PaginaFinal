@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas • JACHA TOURS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #E8CC6A;
+            --black: #080709;
+            --surface: #161419;
+            --text: #e8e4dc;
+            --text-muted: rgba(232,228,220,0.65);
+            --gold-border: rgba(212,175,55,0.35);
+            --transition: 0.4s cubic-bezier(.4,0,.2,1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--black); color: var(--text); font-family: 'Montserrat', sans-serif; line-height: 1.6; overflow-x: hidden; }
+        
+        /* ─── NAV ─── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0 5vw; height: 80px; display: flex; align-items: center;
+            background: rgba(8, 7, 9, 0.95); backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+        }
+        .nav-inner { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; color: var(--gold); letter-spacing: 0.15em; font-weight: 600; }
+        .nav-links { display: flex; gap: 35px; }
+        .nav-links a { text-decoration: none; color: var(--text-muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.2em; transition: 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+
+        /* ─── SECCIÓN PRINCIPAL ─── */
+        section { padding: 140px 5vw 80px; max-width: 1200px; margin: 0 auto; }
+        .display-serif { font-family: 'Cormorant Garamond', serif; }
+
+        .niveles-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        .nivel-card { 
+            background: var(--surface); 
+            border: 1px solid var(--gold-border); 
+            padding: 50px 35px; 
+            text-align: center; 
+            transition: var(--transition);
+            position: relative;
+        }
+        .nivel-card:hover { border-color: var(--gold); transform: translateY(-10px); background: #1c1a21; }
+        .nivel-card span { color: var(--gold); font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; display: block; margin-bottom: 15px; }
+        .nivel-card h3 { color: var(--text); font-size: 2rem; margin-bottom: 10px; font-weight: 400; }
+        .nivel-card .price { color: var(--gold); font-size: 2.4rem; margin-bottom: 30px; }
+
+        /* ─── PREVIEW DINÁMICO (IMPORTANTE) ─── */
+        .preview-container { 
+            display: none; 
+            grid-template-columns: 1.2fr 1fr; 
+            background: var(--surface); 
+            border: 1px solid var(--gold-border); 
+            margin-top: 50px; 
+            overflow: hidden; 
+            animation: fadeIn 0.6s ease forwards;
+        }
+        .preview-img-wrapper { min-height: 450px; position: relative; overflow: hidden; }
+        .preview-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: 1s; }
+        .preview-info { padding: 60px; display: flex; flex-direction: column; justify-content: center; }
+        .feature-tag { color: var(--gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 15px; display: block; }
+        .preview-info h3 { color: var(--text); font-size: 3rem; margin: 0 0 20px 0; font-weight: 300; line-height: 1; }
+        
+        .nivel-features { list-style: none; margin-bottom: 35px; }
+        .nivel-features li { color: var(--text); margin-bottom: 15px; font-size: 0.9rem; display: flex; gap: 15px; align-items: center; }
+        .nivel-features li::before { content: ""; width: 20px; height: 1px; background: var(--gold); }
+
+        /* ─── FORMULARIO ─── */
+        .form-reserva { display: none; margin-top: 40px; padding-top: 40px; border-top: 1px solid rgba(212,175,55,0.2); animation: fadeIn 0.8s ease; }
+        .form-reserva h4 { color: var(--gold); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.85rem; margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .input-jacha { background: transparent; border: none; border-bottom: 1px solid var(--gold-border); padding: 15px 0; color: white; width: 100%; font-family: inherit; font-size: 0.95rem; transition: 0.3s; }
+        .input-jacha:focus { outline: none; border-color: var(--gold); background: rgba(212,175,55,0.03); }
+
+        /* ─── BOTONES ─── */
+        .btn { padding: 18px 30px; text-transform: uppercase; letter-spacing: 0.25em; font-weight: 700; font-size: 0.7rem; cursor: pointer; transition: 0.3s; display: inline-block; border: none; text-decoration: none; text-align: center; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .btn-gold:hover { background: var(--gold-light); transform: translateY(-3px); }
+        .btn-outline { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+        .btn-outline:hover { background: var(--gold); color: #000; }
+
+        /* ─── BANNER FINAL ─── */
+        .booking-banner { background: var(--surface); border-top: 1px solid var(--gold-border); padding: 80px 5vw; margin-top: 100px; }
+        .booking-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 40px; }
+        .dot { width: 10px; height: 10px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 12px; box-shadow: 0 0 15px rgba(74, 222, 128, 0.5); animation: pulse 2s infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+        @media (max-width: 950px) {
+            .preview-container { grid-template-columns: 1fr; }
+            .preview-info { padding: 40px 25px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .preview-info h3 { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="nav-inner">
+            <div class="logo">JACHA<span> TOURS</span></div>
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="circuito.html">Circuito</a>
+                <a href="experiencia.html">Experiencia</a>
+                <a href="reservas.html" style="color: var(--gold);">Reservas</a>
+            </div>
+            <a href="#reservas" class="btn btn-gold" style="padding: 12px 25px; font-size: 0.6rem;">RESERVAR AHORA</a>
+        </div>
+    </nav>
+
+    <section id="reservas">
+        <div style="text-align: center; margin-bottom: 80px;">
+            <p style="color: var(--gold); letter-spacing: 0.6em; text-transform: uppercase; font-size: 0.75rem; margin-bottom: 15px;">Paso 01</p>
+            <h2 class="display-serif" style="font-size: clamp(2.5rem, 6vw, 4rem); color: var(--text);">Seleccione su Nivel</h2>
+            <div style="width: 60px; height: 2px; background: var(--gold); margin: 25px auto;"></div>
+        </div>
+        
+        <div class="niveles-grid">
+            <div class="nivel-card">
+                <span>Iniciación</span>
+                <h3 class="display-serif">Blue Silver</h3>
+                <p class="display-serif price">$250</p>
+                <button class="btn btn-outline" onclick="updatePreview('silver')" style="width:100%">Ver Detalles</button>
+            </div>
+            <div class="nivel-card" style="border-color: var(--gold); background: rgba(212,175,55,0.05);">
+                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gold); color: black; font-size: 0.6rem; font-weight: 800; padding: 4px 15px; letter-spacing: 1px;">RECOMENDADO</div>
+                <span>Experiencia</span>
+                <h3 class="display-serif">Aurum Gold</h3>
+                <p class="display-serif price">$550</p>
+                <button class="btn btn-gold" onclick="updatePreview('gold')" style="width:100%">Ver Detalles</button>
+            </div>
+            <div class="nivel-card">
+                <span>Distinción</span>
+                <h3 class="display-serif">Platinum VIP</h3>
+                <p class="display-serif price">$1,200</p>
+                <button class="btn btn-outline" onclick="updatePreview('platinum')" style="width:100%">Ver Detalles</button>
+            </div>
+        </div>
+
+        <div id="dynamicPreview" class="preview-container">
+            <div class="preview-img-wrapper">
+                <img id="prevImg" src="" alt="Vista previa del tour">
+            </div>
+            <div class="preview-info">
+                <span class="feature-tag" id="prevTag">Lujo Ancestral</span>
+                <h3 class="display-serif" id="prevTitle">Plan Seleccionado</h3>
+                <ul class="nivel-features" id="prevList">
+                    </ul>
+                <button id="btnConfirmar" class="btn btn-gold" onclick="showForm()" style="width: fit-content; padding: 20px 50px;">Confirmar Interés</button>
+
+                <div id="formDatos" class="form-reserva">
+                    <h4>Datos para su Reserva</h4>
+                    <form class="form-grid" id="mainForm">
+                        <input type="text" class="input-jacha" placeholder="NOMBRE COMPLETO" required>
+                        <input type="tel" class="input-jacha" placeholder="WHATSAPP / CELULAR" required>
+                        <input type="email" class="input-jacha" placeholder="CORREO ELECTRÓNICO" style="grid-column: span 1;" required>
+                        <select class="input-jacha" style="background: var(--surface); color: var(--text-muted);">
+                            <option>1 Persona</option>
+                            <option>2 Personas</option>
+                            <option>Grupo (4+)</option>
+                        </select>
+                        <button type="submit" class="btn btn-gold" style="grid-column: span 2; margin-top: 20px;">ENVIAR SOLICITUD DE RESERVA</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="booking-banner">
+        <div class="booking-inner">
+            <div class="booking-meta">
+                <div style="margin-bottom: 15px;">
+                    <div class="dot"></div>
+                    <span style="color: #4ade80; font-size: 0.7rem; letter-spacing: 0.2em; font-weight: 700; text-transform: uppercase;">Próxima Salida Confirmada</span>
+                </div>
+                <div class="display-serif" style="font-size: clamp(2.5rem, 5vw, 3.8rem); line-height: 1;">15 Junio, 2026</div>
+                <p style="color: var(--text-muted); font-size: 0.8rem; letter-spacing: 0.15em; margin-top: 15px;">QUEDAN 4 CUPOS DISPONIBLES PARA EL ALTO</p>
+            </div>
+            <a href="#reservas" class="btn btn-gold" style="padding: 22px 50px; font-size: 0.8rem;">Asegurar mi lugar →</a>
+        </div>
+    </div>
+
+    <footer style="padding: 80px 5vw; text-align: center; border-top: 1px solid rgba(212,175,55,0.1);">
+        <div class="logo" style="margin-bottom: 20px;">JACHA<span> TOURS</span></div>
+        <p style="font-size: 0.75rem; color: var(--text-muted); max-width: 500px; margin: 0 auto;">
+            Experiencias de lujo en la capital mundial de la arquitectura Neoandina. 
+            Ancestral Majesty, Futuristic Luxury.
+        </p>
+        <p style="font-size: 0.65rem; color: rgba(212,175,55,0.4); margin-top: 40px; text-transform: uppercase; letter-spacing: 2px;">
+            © 2026 JACHA TOURS BOLIVIA
+        </p>
+    </footer>
+
+    <script>
+        // DATA DE LOS PLANES (AQUÍ ESTÁ TODO LO IMPORTANTE)
+        const plans = {
+            silver: { 
+                title: "Blue Silver", 
+                tag: "Fachadas & Entorno", 
+                img: "images/img-reservas/ingenio-ext.jpeg", 
+                features: [
+                    "Recorrido por las 5 fachadas más icónicas", 
+                    "Audioguía técnica sobre Neoandino", 
+                    "Transporte panorámico con Wi-Fi",
+                    "Fotografía desde puntos estratégicos"
+                ] 
+            },
+            gold: { 
+                title: "Aurum Gold", 
+                tag: "Salones & AR", 
+                img: "images/img-reservas/ingenio-int.jpeg", 
+                features: [
+                    "Acceso exclusivo a Salones de Gala", 
+                    "Experiencia de Realidad Aumentada", 
+                    "Almuerzo Gourmet en el Cholet Crucero",
+                    "Brindis con bebida artesanal andina"
+                ] 
+            },
+            platinum: { 
+                title: "Platinum VIP", 
+                tag: "Exclusividad Total", 
+                img: "images/img-reservas/titanic.jpeg", 
+                features: [
+                    "Acceso privado a Penthouses (viviendas)", 
+                    "Charla con maestros constructores", 
+                    "Sesión fotográfica profesional incluida",
+                    "Seguridad y transporte privado de lujo"
+                ] 
+            }
+        };
+
+        function updatePreview(key) {
+            const data = plans[key];
+            const container = document.getElementById('dynamicPreview');
+            
+            // Ocultar formulario por si estaba abierto
+            document.getElementById('formDatos').style.display = 'none';
+            document.getElementById('btnConfirmar').style.display = 'block';
+            
+            // Mostrar contenedor
+            container.style.display = 'grid';
+            
+            // Actualizar contenido
+            document.getElementById('prevImg').src = data.img;
+            document.getElementById('prevTitle').innerText = data.title;
+            document.getElementById('prevTag').innerText = data.tag;
+            document.getElementById('prevList').innerHTML = data.features.map(f => `<li>${f}</li>`).join('');
+            
+            // Scroll suave
+            window.scrollTo({ top: container.offsetTop - 100, behavior: 'smooth' });
+        }
+
+        function showForm() {
+            document.getElementById('btnConfirmar').style.display = 'none';
+            const form = document.getElementById('formDatos');
+            form.style.display = 'block';
+            form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // Lógica de envío simulada
+        document.getElementById('mainForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert("¡Solicitud enviada con éxito! Un agente de JACHA TOURS te contactará en las próximas horas.");
+                btn.innerText = "SOLICITUD ENVIADA";
+                btn.style.background = "#4ade80";
+                e.target.reset();
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

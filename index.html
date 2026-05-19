@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JACHA TOURS • Circuito de Cholets</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ─── VARIABLES ─── */
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #E8CC6A;
+            --black: #080709;
+            --deep: #0f0e12;
+            --surface: #161419;
+            --text: #e8e4dc;
+            --text-muted: rgba(232,228,220,0.55);
+            --transition: 0.35s cubic-bezier(.4,0,.2,1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { background: var(--black); color: var(--text); font-family: 'Montserrat', sans-serif; font-weight: 300; line-height: 1.7; overflow-x: hidden; }
+        img { display: block; width: 100%; object-fit: cover; }
+        a { color: inherit; text-decoration: none; }
+
+        /* ─── CURSOR PERSONALIZADO ─── */
+        body { cursor: none; }
+        .cursor { position: fixed; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: transform 0.1s; mix-blend-mode: difference; }
+        .cursor-ring { position: fixed; width: 32px; height: 32px; border: 1px solid rgba(212,175,55,0.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: all 0.18s ease; }
+        a:hover ~ .cursor-ring, button:hover ~ .cursor-ring { transform: translate(-50%,-50%) scale(1.8); border-color: var(--gold); }
+
+        /* ─── NAV ─── */
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            padding: 0 5vw; height: 72px; display: flex; align-items: center;
+            transition: background 0.4s, box-shadow 0.4s;
+        }
+        nav.scrolled {
+            background: rgba(8,7,9,0.96);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(212,175,55,0.12);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+        }
+        .nav-inner { width: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-family: 'Cormorant Garamond', serif; font-size: 1.55rem; font-weight: 600; letter-spacing: 0.12em; color: var(--gold); }
+        .logo span { color: var(--text); font-weight: 300; }
+        .nav-links { display: flex; gap: 36px; }
+        .nav-links a { font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); transition: 0.3s; position: relative; }
+        .nav-links a::after { content: ''; position: absolute; left: 0; bottom: -4px; width: 0; height: 1px; background: var(--gold); transition: width 0.3s; }
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { width: 100%; }
+
+        /* ─── HERO ─── */
+        .hero { position: relative; height: 100svh; min-height: 640px; display: flex; align-items: flex-end; padding: 0 5vw 10vh; overflow: hidden; }
+
+        /* ─── VIDEO CONTAINER ─── */
+        .hero-video { position: absolute; inset: 0; z-index: 0; background: var(--deep); overflow: hidden; }
+
+        /* Video mp4 local */
+        .hero-video video {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+        .hero-video video.loaded { opacity: 1; }
+
+        /* Fallback YouTube embed (usado si no hay video local) */
+        .yt-bg {
+            position: absolute; inset: 0; z-index: 1;
+            pointer-events: none; overflow: hidden;
+            display: none; /* se activa por JS si falla el mp4 */
+        }
+        .yt-bg iframe {
+            position: absolute;
+            /* Escalar para cubrir toda la pantalla quitando los controles de YT */
+            top: 50%; left: 50%;
+            width: 177.77vh; /* 16/9 ratio */
+            height: 100vh;
+            min-width: 100vw;
+            min-height: 56.25vw;
+            transform: translate(-50%,-50%);
+            border: none;
+            opacity: 0.55;
+            filter: brightness(0.75) saturate(1.1);
+        }
+
+        /* Gradiente cinemático sobre el video */
+        .hero-video::after {
+            content: ''; position: absolute; inset: 0; z-index: 2;
+            background:
+                linear-gradient(to top, rgba(8,7,9,0.95) 0%, rgba(8,7,9,0.3) 40%, transparent 70%),
+                linear-gradient(to right, rgba(8,7,9,0.5) 0%, transparent 50%);
+        }
+
+        /* Grain cinematográfico */
+        .hero-grain {
+            position: absolute; inset: 0; z-index: 3;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+            background-size: 180px 180px; opacity: 0.22; pointer-events: none;
+            animation: grainShift 0.9s steps(1) infinite;
+        }
+        @keyframes grainShift {
+            0%  { transform: translate(0,0); } 20% { transform: translate(-2%,3%); }
+            40% { transform: translate(3%,-1%); } 60% { transform: translate(-1%,2%); }
+            80% { transform: translate(2%,-3%); } 100% { transform: translate(0,0); }
+        }
+
+        /* Líneas de composición sutil */
+        .hero-lines { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+        .hero-lines::before {
+            content: '';
+            position: absolute; left: 5vw; top: 0; bottom: 0;
+            width: 1px; background: linear-gradient(to bottom, transparent, rgba(212,175,55,0.15), transparent);
+        }
+
+        /* Contenido hero */
+        .hero-content { position: relative; z-index: 4; max-width: 720px; }
+        .hero-eyebrow { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; opacity: 0; transform: translateY(20px); animation: fadeUp 0.8s 0.3s forwards; }
+        .hero-eyebrow .line { width: 32px; height: 1px; background: var(--gold); }
+        .hero-eyebrow span { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); }
+        .hero-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 7.5vw, 6rem);
+            font-weight: 300; line-height: 1.05; margin-bottom: 24px;
+        }
+        .hero-title .t1 { display: block; opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.5s forwards; }
+        .hero-title .t2 { display: block; opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.7s forwards; }
+        .hero-title .t3 { display: block; opacity: 0; transform: translateY(30px); animation: fadeUp 0.8s 0.9s forwards; }
+        .hero-title em { font-style: italic; color: var(--gold); }
+        .hero-actions { display: flex; gap: 14px; opacity: 0; animation: fadeUp 0.8s 1.1s forwards; }
+
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        /* Scroll indicator */
+        .scroll-hint {
+            position: absolute; bottom: 40px; right: 5vw; z-index: 4;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            opacity: 0; animation: fadeUp 0.8s 1.4s forwards;
+        }
+        .scroll-hint span { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); writing-mode: vertical-rl; }
+        .scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s infinite; }
+        @keyframes scrollPulse { 0%,100% { opacity: 0.4; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(0.6); } }
+
+        /* Contador flotante */
+        .hero-stat {
+            position: absolute; bottom: 10vh; right: 5vw; z-index: 4;
+            text-align: right; opacity: 0; animation: fadeUp 0.8s 1.2s forwards;
+        }
+        .hero-stat .num { font-family: 'Cormorant Garamond', serif; font-size: clamp(3.5rem,6vw,5rem); font-weight: 300; color: var(--gold); line-height: 1; }
+        .hero-stat .label { font-size: 0.62rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+
+        /* ─── SECCIONES GENERALES ─── */
+        section { padding: 100px 5vw; }
+        .section-label { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; color: var(--gold); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 3px; }
+        .section-label .line { width: 32px; height: 1px; background: var(--gold); }
+        .section-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; margin-bottom: 48px; }
+        .section-title em { font-style: italic; color: var(--gold); }
+
+        /* ─── CATÁLOGO ─── */
+        #catalogo { background: var(--deep); }
+        .catalog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+        .catalog-card { position: relative; aspect-ratio: 3/4; overflow: hidden; cursor: pointer; }
+        .catalog-card img { height: 100%; transition: transform 0.9s cubic-bezier(0.4,0,0.2,1); }
+        .catalog-card:hover img { transform: scale(1.08); }
+        .catalog-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(8,7,9,0.92) 0%, transparent 55%);
+            padding: 28px; display: flex; flex-direction: column; justify-content: flex-end;
+            transition: background 0.4s;
+        }
+        .catalog-card:hover .catalog-card-overlay { background: linear-gradient(to top, rgba(8,7,9,0.96) 20%, rgba(8,7,9,0.2) 70%); }
+        .catalog-tag { color: var(--gold); font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px; }
+        .catalog-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 300; margin-bottom: 8px; }
+        .catalog-card p { font-size: 0.8rem; color: var(--text-muted); max-height: 0; overflow: hidden; transition: max-height 0.4s; }
+        .catalog-card:hover p { max-height: 60px; }
+        .catalog-card-arrow {
+            position: absolute; top: 20px; right: 20px;
+            width: 40px; height: 40px; border: 1px solid rgba(212,175,55,0.3);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gold); font-size: 1.1rem;
+            opacity: 0; transform: translateY(-8px); transition: all 0.3s;
+        }
+        .catalog-card:hover .catalog-card-arrow { opacity: 1; transform: translateY(0); }
+
+        /* ─── NIVELES ─── */
+        #niveles { position: relative; overflow: hidden; }
+        #niveles::before {
+            content: 'JACHA';
+            position: absolute; right: -2vw; top: 50%; transform: translateY(-50%);
+            font-family: 'Cormorant Garamond', serif; font-size: 22vw; font-weight: 700;
+            color: rgba(212,175,55,0.03); pointer-events: none; line-height: 1;
+        }
+        .niveles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
+        .nivel-card {
+            background: var(--surface); padding: 44px 36px;
+            border: 1px solid rgba(212,175,55,0.1); transition: 0.4s;
+            position: relative; overflow: hidden;
+        }
+        .nivel-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.4s;
+        }
+        .nivel-card:hover { transform: translateY(-6px); border-color: rgba(212,175,55,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .nivel-card:hover::before { opacity: 1; }
+        .nivel-card.featured { background: #1a181f; border: 1px solid var(--gold); transform: scale(1.03); box-shadow: 0 20px 60px rgba(212,175,55,0.1); }
+        .nivel-card.featured:hover { transform: scale(1.03) translateY(-6px); }
+        .nivel-badge { background: var(--gold); color: black; font-size: 0.58rem; font-weight: 700; padding: 4px 12px; display: inline-block; margin-bottom: 18px; letter-spacing: 2px; }
+        .nivel-name { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; font-weight: 300; margin-bottom: 12px; }
+        .nivel-price { font-size: 2.6rem; color: var(--gold); font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+        .nivel-price span { font-size: 0.8rem; color: var(--text-muted); font-family: 'Montserrat', sans-serif; }
+        .nivel-features { list-style: none; margin: 28px 0; border-top: 1px solid rgba(212,175,55,0.15); padding-top: 24px; }
+        .nivel-features li { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; display: flex; align-items: flex-start; gap: 12px; }
+        .nivel-features li::before { content: '—'; color: var(--gold); flex-shrink: 0; }
+
+        /* ─── BOTONES ─── */
+        .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 28px; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; cursor: pointer; border: none; text-align: center; }
+        .btn-primary { background: var(--gold); color: black; }
+        .btn-primary:hover { background: var(--gold-light); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(212,175,55,0.3); }
+        .btn-outline { border: 1px solid rgba(212,175,55,0.5); color: var(--gold); background: transparent; }
+        .btn-outline:hover { border-color: var(--gold); background: rgba(212,175,55,0.06); transform: translateY(-3px); }
+
+        /* ─── BANNER RESERVA ─── */
+        .booking-banner {
+            background: linear-gradient(135deg, #141218, #1a1620);
+            border-top: 1px solid rgba(212,175,55,0.2);
+            border-bottom: 1px solid rgba(212,175,55,0.2);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 52px 5vw; gap: 30px;
+        }
+        .booking-banner .meta { display: flex; flex-direction: column; gap: 6px; }
+        .dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; display: inline-block; margin-right: 8px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74,222,128,0.4); } 50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(74,222,128,0); } }
+        .booking-date { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 300; }
+        .booking-slots { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); }
+
+        /* ─── FOOTER ─── */
+        footer {
+            padding: 60px 5vw;
+            border-top: 1px solid rgba(212,175,55,0.1);
+            display: grid; grid-template-columns: 1fr auto;
+            align-items: center; gap: 20px;
+        }
+        .footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--gold); font-weight: 300; letter-spacing: 0.12em; }
+        .footer-copy { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-top: 8px; }
+        .footer-links { display: flex; gap: 24px; }
+        .footer-links a { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); transition: color 0.3s; }
+        .footer-links a:hover { color: var(--gold); }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 900px) {
+            .catalog-grid, .niveles-grid { grid-template-columns: 1fr; }
+            .nivel-card.featured { transform: scale(1); }
+            .booking-banner { flex-direction: column; text-align: center; }
+            .nav-links, .nav-links + a { display: none; }
+            footer { grid-template-columns: 1fr; text-align: center; }
+            .footer-links { justify-content: center; }
+        }
+        @media (max-width: 600px) {
+            .hero-actions { flex-direction: column; }
+            .hero-stat { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cursor personalizado -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- ─── NAV ─── -->
+    <nav id="mainNav">
+        <div class="nav-inner">
+            <a href="index.html" class="logo">JACHA<span> TOURS</span></a>
+            <div class="nav-links">
+                <a href="index.html">Inicio</a>
+                <a href="circuito.html">Circuito</a>
+                <a href="experiencia.html">Experiencia</a>
+                <a href="reservas.html">Reservas</a>
+            </div>
+            <a href="reservas.html" class="btn btn-primary" style="padding: 10px 22px; font-size: 0.62rem;">RESERVAR</a>
+        </div>
+    </nav>
+
+    <!-- ─── HERO ─── -->
+    <section class="hero">
+        <div class="hero-video">
+            <!-- ① VIDEO LOCAL (primera opción — el que subes al repo) -->
+            <video
+                id="heroVideo"
+                autoplay muted loop playsinline
+                poster="./images/img-inicio/hero/hero-background.jpeg"
+                oncanplay="this.classList.add('loaded')"
+            >
+                <source src="./videos/hero-background.webm" type="video/webm">
+                <source src="./videos/hero-background.mp4" type="video/mp4">
+            </video>
+
+            <!-- ② FALLBACK YOUTUBE (se activa si no hay video local)
+                 PASOS PARA USAR TU VIDEO DE YOUTUBE:
+                 1. Copia el ID del video de YouTube (la parte después de ?v= en la URL)
+                    Ej: https://www.youtube.com/watch?v=XXXXXXXXXX  → ID = XXXXXXXXXX
+                 2. Reemplaza TU_VIDEO_ID_AQUI por ese ID
+                 3. Si subes el .mp4 al repo, el embed de YouTube no se mostrará (es backup)
+            -->
+            <div class="yt-bg" id="ytBg">
+                <iframe
+                    id="ytPlayer"
+                    src="https://www.youtube-nocookie.com/embed/TU_VIDEO_ID_AQUI?autoplay=1&mute=1&loop=1&playlist=TU_VIDEO_ID_AQUI&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1&fs=0&color=white"
+                    allow="autoplay; fullscreen"
+                    allowfullscreen
+                    title="Fondo Jacha Tours"
+                ></iframe>
+            </div>
+        </div>
+        <div class="hero-grain"></div>
+        <div class="hero-lines"></div>
+
+        <div class="hero-content">
+            <div class="hero-eyebrow">
+                <div class="line"></div>
+                <span>El Alto, Bolivia · 4200 m.s.n.m.</span>
+            </div>
+            <h1 class="hero-title">
+                <span class="t1">Descubre la</span>
+                <span class="t2"><em>Arquitectura</em></span>
+                <span class="t3">Andina Moderna</span>
+            </h1>
+            <div class="hero-actions">
+                <a href="circuito.html" class="btn btn-primary">Explorar Circuito →</a>
+                <a href="reservas.html" class="btn btn-outline">Ver Paquetes</a>
+            </div>
+        </div>
+
+        <div class="hero-stat">
+            <div class="num">12</div>
+            <div class="label">Cholets Icónicos</div>
+        </div>
+
+        <div class="scroll-hint">
+            <div class="scroll-line"></div>
+            <span>Scroll</span>
+        </div>
+    </section>
+
+    <!-- ─── CATÁLOGO ─── -->
+    <section id="catalogo">
+        <div class="section-label"><div class="line"></div><span>Arquitectura</span></div>
+        <h2 class="section-title">Catálogo <em>Arquitectónico</em></h2>
+        <div class="catalog-grid">
+            <div class="catalog-card">
+                <img src="./images/img-inicio/cholets/cholet-crucero.jpeg" alt="Cholet Crucero">
+                <div class="catalog-card-overlay">
+                    <div class="catalog-tag">Náutico-Andino</div>
+                    <h3>Cholet Crucero</h3>
+                    <p>Símbolo de prosperidad y viaje. Fachada inspirada en los grandes transatlánticos.</p>
+                </div>
+                <div class="catalog-card-arrow">↗</div>
+            </div>
+            <div class="catalog-card">
+                <img src="./images/img-inicio/cholets/cholet-transformer.jpeg" alt="Cholet Transformer">
+                <div class="catalog-card-overlay">
+                    <div class="catalog-tag">Freddy Mamani</div>
+                    <h3>The Transformer</h3>
+                    <p>Fachadas que cobran vida propia. La obra cumbre del neoandino contemporáneo.</p>
+                </div>
+                <div class="catalog-card-arrow">↗</div>
+            </div>
+            <div class="catalog-card">
+                <img src="./images/img-inicio/cholets/salon-condor.jpeg" alt="Salón Cóndor">
+                <div class="catalog-card-overlay">
+                    <div class="catalog-tag">Interiorismo</div>
+                    <h3>Salón Cóndor</h3>
+                    <p>Lujo en cada detalle de pan de oro. Interiores que desafían toda convención.</p>
+                </div>
+                <div class="catalog-card-arrow">↗</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── NIVELES ─── -->
+    <section id="niveles">
+        <div class="section-label"><div class="line"></div><span>Paquetes</span></div>
+        <h2 class="section-title">Niveles de <em>Inmersión</em></h2>
+        <div class="niveles-grid">
+            <div class="nivel-card">
+                <div class="nivel-name">Blue Silver</div>
+                <div class="nivel-price">$250<span> /pax</span></div>
+                <ul class="nivel-features">
+                    <li>Tour Panorámico El Alto</li>
+                    <li>Acceso a 3 Fachadas Icónicas</li>
+                    <li>Guía Local bilingüe</li>
+                </ul>
+                <a href="reservas.html" class="btn btn-outline" style="width: 100%; justify-content: center;">Seleccionar</a>
+            </div>
+            <div class="nivel-card featured">
+                <div class="nivel-badge">✦ RECOMENDADO</div>
+                <div class="nivel-name">Aurum Gold</div>
+                <div class="nivel-price">$550<span> /pax</span></div>
+                <ul class="nivel-features">
+                    <li>Almuerzo Gourmet en Cholet</li>
+                    <li>Transporte Privado Luxury</li>
+                    <li>Acceso a Interiores Exclusivos</li>
+                    <li>Guía Especializado</li>
+                </ul>
+                <a href="reservas.html" class="btn btn-primary" style="width: 100%; justify-content: center;">Seleccionar →</a>
+            </div>
+            <div class="nivel-card">
+                <div class="nivel-name">Platinum VIP</div>
+                <div class="nivel-price">$1,200<span> /pax</span></div>
+                <ul class="nivel-features">
+                    <li>Acceso a Penthouses Privados</li>
+                    <li>Sesión Fotográfica Profesional</li>
+                    <li>Cena de Gala Incluida</li>
+                    <li>Seguridad Privada 24h</li>
+                </ul>
+                <a href="reservas.html" class="btn btn-outline" style="width: 100%; justify-content: center;">Seleccionar</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ─── BANNER PRÓXIMO TOUR ─── -->
+    <div class="booking-banner">
+        <div class="meta">
+            <div style="font-size: 0.68rem; color: #4ade80; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;">
+                <span class="dot"></span>Próximo Tour Disponible
+            </div>
+            <div class="booking-date">15 Junio, 2026</div>
+            <div class="booking-slots">Solo 4 espacios disponibles</div>
+        </div>
+        <a href="reservas.html" class="btn btn-primary" style="padding: 20px 44px; font-size: 0.75rem;">
+            Reservar Ahora →
+        </a>
+    </div>
+
+    <!-- ─── FOOTER ─── -->
+    <footer>
+        <div>
+            <div class="footer-logo">JACHA TOURS</div>
+            <div class="footer-copy">© 2026 JACHA TOURS — Ancestral Majesty, Futuristic Luxury</div>
+        </div>
+        <div class="footer-links">
+            <a href="circuito.html">Circuito</a>
+            <a href="experiencia.html">Experiencia</a>
+            <a href="reservas.html">Reservas</a>
+        </div>
+    </footer>
+
+    <script>
+        // ─── Cursor personalizado ───
+        const cursor = document.getElementById('cursor');
+        const ring = document.getElementById('cursorRing');
+        let mx = 0, my = 0, rx = 0, ry = 0;
+        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
+        function animateRing() { rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12; ring.style.left = rx + 'px'; ring.style.top = ry + 'px'; requestAnimationFrame(animateRing); }
+        animateRing();
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mouseenter', () => ring.style.transform = 'translate(-50%,-50%) scale(2)');
+            el.addEventListener('mouseleave', () => ring.style.transform = 'translate(-50%,-50%) scale(1)');
+        });
+
+        // ─── Nav scroll ───
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 60); });
+
+        // ─── Lógica video: si el mp4 no carga, mostrar YouTube embed ───
+        const vid = document.getElementById('heroVideo');
+        const ytBg = document.getElementById('ytBg');
+
+        // Si el video no se carga en 4 segundos, activar YouTube
+        const ytTimeout = setTimeout(() => {
+            if (!vid.classList.contains('loaded')) {
+                vid.style.display = 'none';
+                ytBg.style.display = 'block';
+            }
+        }, 4000);
+
+        vid.addEventListener('canplay', () => { clearTimeout(ytTimeout); });
+        vid.addEventListener('error', () => {
+            clearTimeout(ytTimeout);
+            vid.style.display = 'none';
+            ytBg.style.display = 'block';
+        });
+
+        // ─── Scroll reveal suave ───
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.nivel-card, .catalog-card').forEach(el => {
+            el.style.opacity = '0'; el.style.transform = 'translateY(24px)';
+            el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
